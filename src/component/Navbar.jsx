@@ -9,7 +9,9 @@ export default function Navbar() {
   const navItems = [
     { name: 'All Words', path: '/' },
     { name: 'Random 10', path: '/random' },
-    { name: 'Add Words', path: '/add' }
+    { name: 'Add Words', path: '/add' },
+    { name: 'Groups', path: '/groups' }
+
   ];
 
   return (
