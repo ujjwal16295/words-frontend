@@ -17,10 +17,26 @@ export default function GroupsPage() {
   const fetchGroups = async () => {
     try {
       setLoading(true);
+      
+      // Check session storage first
+      const cachedData = sessionStorage.getItem('vocabularyGroups');
+      
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        setGroups(parsedData);
+        setExpandedGroups(new Set(Object.keys(parsedData)));
+        setLoading(false);
+        return;
+      }
+
+      // If no cache, fetch from API
       const response = await fetch('https://words-backend-zkxe.onrender.com/api/vocabulary/groups');
       const data = await response.json();
+      
+      // Save to session storage
+      sessionStorage.setItem('vocabularyGroups', JSON.stringify(data));
+      
       setGroups(data);
-      // Expand all groups by default
       setExpandedGroups(new Set(Object.keys(data)));
     } catch (error) {
       console.error('Error fetching groups:', error);
