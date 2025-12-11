@@ -6,6 +6,7 @@ import Navbar from '@/component/Navbar';
 export default function RandomWordsPage() {
   const [words, setWords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [speakingWord, setSpeakingWord] = useState(null);
 
   useEffect(() => {
     fetchRandomWords();
@@ -22,6 +23,34 @@ export default function RandomWordsPage() {
       console.error('Error fetching random words:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const speakWord = (word) => {
+    // Check if browser supports speech synthesis
+    if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.rate = 0.8; // Slightly slower for clarity
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      
+      // Set speaking state
+      setSpeakingWord(word);
+      
+      utterance.onend = () => {
+        setSpeakingWord(null);
+      };
+      
+      utterance.onerror = () => {
+        setSpeakingWord(null);
+      };
+      
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('Sorry, your browser does not support text-to-speech.');
     }
   };
 
@@ -60,9 +89,32 @@ export default function RandomWordsPage() {
                   </div>
                   
                   <div className="flex-grow">
-                    <h3 className="text-2xl font-bold text-purple-600 capitalize mb-2">
-                      {item.word}
-                    </h3>
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-2xl font-bold text-purple-600 capitalize">
+                        {item.word}
+                      </h3>
+                      
+                      <button
+                        onClick={() => speakWord(item.word)}
+                        disabled={speakingWord === item.word}
+                        className="p-2 rounded-full bg-purple-100 hover:bg-purple-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Pronounce word"
+                      >
+                        {speakingWord === item.word ? (
+                          <svg className="w-5 h-5 text-purple-600 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M11.553 3.064A.75.75 0 0112 3.75v16.5a.75.75 0 01-1.255.555L5.46 16H2.75A1.75 1.75 0 011 14.25v-4.5C1 8.784 1.784 8 2.75 8h2.71l5.285-4.805a.75.75 0 01.808-.13zM10.5 5.445l-4.245 3.86a.75.75 0 01-.505.195h-3a.25.25 0 00-.25.25v4.5c0 .138.112.25.25.25h3a.75.75 0 01.505.195l4.245 3.86V5.445z"/>
+                            <path d="M18.718 4.222a.75.75 0 011.06 0c4.296 4.296 4.296 11.26 0 15.556a.75.75 0 01-1.06-1.06 9.5 9.5 0 000-13.436.75.75 0 010-1.06z"/>
+                            <path d="M16.243 7.757a.75.75 0 10-1.061 1.061 4.5 4.5 0 010 6.364.75.75 0 001.06 1.06 6 6 0 000-8.485z"/>
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M11.553 3.064A.75.75 0 0112 3.75v16.5a.75.75 0 01-1.255.555L5.46 16H2.75A1.75 1.75 0 011 14.25v-4.5C1 8.784 1.784 8 2.75 8h2.71l5.285-4.805a.75.75 0 01.808-.13zM10.5 5.445l-4.245 3.86a.75.75 0 01-.505.195h-3a.25.25 0 00-.25.25v4.5c0 .138.112.25.25.25h3a.75.75 0 01.505.195l4.245 3.86V5.445z"/>
+                            <path d="M18.718 4.222a.75.75 0 011.06 0c4.296 4.296 4.296 11.26 0 15.556a.75.75 0 01-1.06-1.06 9.5 9.5 0 000-13.436.75.75 0 010-1.06z"/>
+                            <path d="M16.243 7.757a.75.75 0 10-1.061 1.061 4.5 4.5 0 010 6.364.75.75 0 001.06 1.06 6 6 0 000-8.485z"/>
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                     
                     <p className="text-gray-700 text-lg mb-4 leading-relaxed">
                       {item.meaning}

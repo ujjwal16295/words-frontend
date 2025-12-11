@@ -1,4 +1,3 @@
-// app/groups/page.jsx
 'use client';
 
 import Navbar from '@/component/Navbar';
@@ -9,6 +8,7 @@ export default function GroupsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedGroups, setExpandedGroups] = useState(new Set());
+  const [speakingWord, setSpeakingWord] = useState(null);
 
   useEffect(() => {
     fetchGroups();
@@ -55,6 +55,31 @@ export default function GroupsPage() {
       }
       return newSet;
     });
+  };
+
+  const speakWord = (word) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.rate = 0.8;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      
+      setSpeakingWord(word);
+      
+      utterance.onend = () => {
+        setSpeakingWord(null);
+      };
+      
+      utterance.onerror = () => {
+        setSpeakingWord(null);
+      };
+      
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('Sorry, your browser does not support text-to-speech.');
+    }
   };
 
   const filteredGroups = Object.entries(groups).filter(([groupName, words]) => {
@@ -197,9 +222,35 @@ export default function GroupsPage() {
                             key={item.word}
                             className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-100 hover:border-purple-200 transition-colors"
                           >
-                            <h4 className="text-lg font-bold text-purple-700 capitalize mb-2">
-                              {item.word}
-                            </h4>
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <h4 className="text-lg font-bold text-purple-700 capitalize">
+                                {item.word}
+                              </h4>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  speakWord(item.word);
+                                }}
+                                disabled={speakingWord === item.word}
+                                className="flex-shrink-0 p-1.5 rounded-full bg-purple-100 hover:bg-purple-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Pronounce word"
+                              >
+                                {speakingWord === item.word ? (
+                                  <svg className="w-4 h-4 text-purple-600 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M11.553 3.064A.75.75 0 0112 3.75v16.5a.75.75 0 01-1.255.555L5.46 16H2.75A1.75 1.75 0 011 14.25v-4.5C1 8.784 1.784 8 2.75 8h2.71l5.285-4.805a.75.75 0 01.808-.13zM10.5 5.445l-4.245 3.86a.75.75 0 01-.505.195h-3a.25.25 0 00-.25.25v4.5c0 .138.112.25.25.25h3a.75.75 0 01.505.195l4.245 3.86V5.445z"/>
+                                    <path d="M18.718 4.222a.75.75 0 011.06 0c4.296 4.296 4.296 11.26 0 15.556a.75.75 0 01-1.06-1.06 9.5 9.5 0 000-13.436.75.75 0 010-1.06z"/>
+                                    <path d="M16.243 7.757a.75.75 0 10-1.061 1.061 4.5 4.5 0 010 6.364.75.75 0 001.06 1.06 6 6 0 000-8.485z"/>
+                                  </svg>
+                                ) : (
+                                  <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M11.553 3.064A.75.75 0 0112 3.75v16.5a.75.75 0 01-1.255.555L5.46 16H2.75A1.75 1.75 0 011 14.25v-4.5C1 8.784 1.784 8 2.75 8h2.71l5.285-4.805a.75.75 0 01.808-.13zM10.5 5.445l-4.245 3.86a.75.75 0 01-.505.195h-3a.25.25 0 00-.25.25v4.5c0 .138.112.25.25.25h3a.75.75 0 01.505.195l4.245 3.86V5.445z"/>
+                                    <path d="M18.718 4.222a.75.75 0 011.06 0c4.296 4.296 4.296 11.26 0 15.556a.75.75 0 01-1.06-1.06 9.5 9.5 0 000-13.436.75.75 0 010-1.06z"/>
+                                    <path d="M16.243 7.757a.75.75 0 10-1.061 1.061 4.5 4.5 0 010 6.364.75.75 0 001.06 1.06 6 6 0 000-8.485z"/>
+                                  </svg>
+                                )}
+                              </button>
+                            </div>
+                            
                             <p className="text-gray-700 text-sm mb-3 leading-relaxed">
                               {item.meaning}
                             </p>

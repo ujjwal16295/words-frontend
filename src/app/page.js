@@ -1,4 +1,3 @@
-// app/page.jsx
 'use client';
 
 import Navbar from '@/component/Navbar';
@@ -9,6 +8,7 @@ export default function AllWordsPage() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [speakingWord, setSpeakingWord] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 30,
@@ -76,6 +76,31 @@ export default function AllWordsPage() {
     }
   };
 
+  const speakWord = (word) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.rate = 0.8;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      
+      setSpeakingWord(word);
+      
+      utterance.onend = () => {
+        setSpeakingWord(null);
+      };
+      
+      utterance.onerror = () => {
+        setSpeakingWord(null);
+      };
+      
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('Sorry, your browser does not support text-to-speech.');
+    }
+  };
+
   const filteredWords = words.filter((w) =>
     w.word.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -115,12 +140,34 @@ export default function AllWordsPage() {
                   className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100"
                 >
                   <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-xl font-bold text-indigo-600 capitalize">
-                      {item.word}
-                    </h3>
+                    <div className="flex items-center gap-2 flex-1">
+                      <h3 className="text-xl font-bold text-indigo-600 capitalize">
+                        {item.word}
+                      </h3>
+                      <button
+                        onClick={() => speakWord(item.word)}
+                        disabled={speakingWord === item.word}
+                        className="p-1.5 rounded-full bg-indigo-100 hover:bg-indigo-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                        title="Pronounce word"
+                      >
+                        {speakingWord === item.word ? (
+                          <svg className="w-4 h-4 text-indigo-600 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M11.553 3.064A.75.75 0 0112 3.75v16.5a.75.75 0 01-1.255.555L5.46 16H2.75A1.75 1.75 0 011 14.25v-4.5C1 8.784 1.784 8 2.75 8h2.71l5.285-4.805a.75.75 0 01.808-.13zM10.5 5.445l-4.245 3.86a.75.75 0 01-.505.195h-3a.25.25 0 00-.25.25v4.5c0 .138.112.25.25.25h3a.75.75 0 01.505.195l4.245 3.86V5.445z"/>
+                            <path d="M18.718 4.222a.75.75 0 011.06 0c4.296 4.296 4.296 11.26 0 15.556a.75.75 0 01-1.06-1.06 9.5 9.5 0 000-13.436.75.75 0 010-1.06z"/>
+                            <path d="M16.243 7.757a.75.75 0 10-1.061 1.061 4.5 4.5 0 010 6.364.75.75 0 001.06 1.06 6 6 0 000-8.485z"/>
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M11.553 3.064A.75.75 0 0112 3.75v16.5a.75.75 0 01-1.255.555L5.46 16H2.75A1.75 1.75 0 011 14.25v-4.5C1 8.784 1.784 8 2.75 8h2.71l5.285-4.805a.75.75 0 01.808-.13zM10.5 5.445l-4.245 3.86a.75.75 0 01-.505.195h-3a.25.25 0 00-.25.25v4.5c0 .138.112.25.25.25h3a.75.75 0 01.505.195l4.245 3.86V5.445z"/>
+                            <path d="M18.718 4.222a.75.75 0 011.06 0c4.296 4.296 4.296 11.26 0 15.556a.75.75 0 01-1.06-1.06 9.5 9.5 0 000-13.436.75.75 0 010-1.06z"/>
+                            <path d="M16.243 7.757a.75.75 0 10-1.061 1.061 4.5 4.5 0 010 6.364.75.75 0 001.06 1.06 6 6 0 000-8.485z"/>
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                     <button
                       onClick={() => handleDelete(item.word)}
-                      className="text-red-400 hover:text-red-600 transition-colors"
+                      className="text-red-400 hover:text-red-600 transition-colors flex-shrink-0"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
