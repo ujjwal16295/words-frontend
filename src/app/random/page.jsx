@@ -15,7 +15,7 @@ export default function RandomWordsPage() {
   const fetchRandomWords = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://words-backend-zkxe.onrender.com/api/vocabulary/random');
+      const response = await fetch('https://words-backend-k8uu.onrender.com/api/vocabulary/random');
       const data = await response.json();
       setWords(data);
       console.log(data)

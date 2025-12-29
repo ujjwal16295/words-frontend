@@ -30,7 +30,7 @@ export default function AllWordsPage() {
       }
 
       const response = await fetch(
-        `https://words-backend-zkxe.onrender.com/api/vocabulary?page=${page}&limit=50`
+        `https://words-backend-k8uu.onrender.com/api/vocabulary?page=${page}&limit=50`
       );
       const result = await response.json();
 
@@ -58,7 +58,7 @@ export default function AllWordsPage() {
 
     try {
       const response = await fetch(
-        `https://words-backend-zkxe.onrender.com/api/vocabulary/${word}`,
+        `https://words-backend-k8uu.onrender.com/api/vocabulary/${word}`,
         {
           method: 'DELETE',
         }

@@ -29,7 +29,7 @@ export default function AddWordsPage() {
       let hasMore = true;
 
       while (hasMore) {
-        const response = await fetch('https://words-backend-zkxe.onrender.com/api/vocabulary/bulk', {
+        const response = await fetch('https://words-backend-k8uu.onrender.com/api/vocabulary/bulk', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ words, offset }),

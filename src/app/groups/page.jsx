@@ -30,7 +30,7 @@ export default function GroupsPage() {
       }
 
       // If no cache, fetch from API
-      const response = await fetch('https://words-backend-zkxe.onrender.com/api/vocabulary/groups');
+      const response = await fetch('https://words-backend-k8uu.onrender.com/api/vocabulary/groups');
       const data = await response.json();
       
       // Save to session storage
