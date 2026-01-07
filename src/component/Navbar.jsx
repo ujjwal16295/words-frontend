@@ -10,7 +10,9 @@ export default function Navbar() {
     { name: 'All Words', path: '/' },
     { name: 'Random 10', path: '/random' },
     { name: 'Add Words', path: '/add' },
-    { name: 'Groups', path: '/groups' }
+    { name: 'Groups', path: '/groups' },
+    { name: 'tones', path: '/tone' }
+
 
   ];
 
