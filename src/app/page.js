@@ -1,3 +1,4 @@
+
 'use client';
 
 import Navbar from '@/component/Navbar';
@@ -9,6 +10,7 @@ export default function AllWordsPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [speakingWord, setSpeakingWord] = useState(null);
+  const [showDetailsOnly, setShowDetailsOnly] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 50,
@@ -117,14 +119,35 @@ export default function AllWordsPage() {
           </p>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 flex gap-4 items-center">
           <input
             type="text"
             placeholder="Search words..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="text-black w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+            className="text-black flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
           />
+          
+          <button
+            onClick={() => setShowDetailsOnly(!showDetailsOnly)}
+            className={`px-6 py-3 rounded-lg font-medium transition-all shadow-sm flex items-center gap-2 whitespace-nowrap ${
+              showDetailsOnly
+                ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {showDetailsOnly ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              )}
+              {showDetailsOnly ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              ) : null}
+            </svg>
+            {showDetailsOnly ? 'Words Only' : 'Show Details'}
+          </button>
         </div>
 
         {loading ? (
@@ -133,15 +156,23 @@ export default function AllWordsPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className={`grid gap-6 ${
+              showDetailsOnly 
+                ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6' 
+                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+            }`}>
               {filteredWords.map((item) => (
                 <div
                   key={item.word}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100"
+                  className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 ${
+                    showDetailsOnly ? 'p-4' : 'p-6'
+                  }`}
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-2 flex-1">
-                      <h3 className="text-xl font-bold text-indigo-600 capitalize">
+                      <h3 className={`font-bold text-indigo-600 capitalize ${
+                        showDetailsOnly ? 'text-lg' : 'text-xl'
+                      }`}>
                         {item.word}
                       </h3>
                       <button
@@ -164,7 +195,7 @@ export default function AllWordsPage() {
                           </svg>
                         )}
                       </button>
-                      {item.group_name && (
+                      {!showDetailsOnly && item.group_name && (
                         <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
                           {item.group_name}
                         </span>
@@ -180,47 +211,50 @@ export default function AllWordsPage() {
                     </button>
                   </div>
                   
-                  <p className="text-gray-700 mb-3 leading-relaxed">
-                    {item.meaning}
-                  </p>
+                  {!showDetailsOnly && (
+                    <>
+                      <p className="text-gray-700 mb-3 leading-relaxed">
+                        {item.meaning}
+                      </p>
 
-                  {item.sentence && (
-                    <div className="mb-4 p-3 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border-l-4 border-amber-400">
-                      <p className="text-xs font-semibold text-amber-700 uppercase mb-1 flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32l8.4-8.4z"/>
-                          <path d="M5.25 5.25a3 3 0 00-3 3v10.5a3 3 0 003 3h10.5a3 3 0 003-3V13.5a.75.75 0 00-1.5 0v5.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V8.25a1.5 1.5 0 011.5-1.5h5.25a.75.75 0 000-1.5H5.25z"/>
-                        </svg>
-                        Example
-                      </p>
-                      <p className="text-gray-800 text-sm italic">
-                        "{item.sentence}"
-                      </p>
-                    </div>
-                  )}
-                  
-                  {item.synonyms && item.synonyms.length > 0 && (
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
-                        Synonyms
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {item.synonyms.map((syn, idx) => (
-                          <span
-                            key={idx}
-                            className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm"
-                          >
-                            {syn}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                      {item.sentence && (
+                        <div className="mb-4 p-3 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border-l-4 border-amber-400">
+                          <p className="text-xs font-semibold text-amber-700 uppercase mb-1 flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32l8.4-8.4z"/>
+                              <path d="M5.25 5.25a3 3 0 00-3 3v10.5a3 3 0 003 3h10.5a3 3 0 003-3V13.5a.75.75 0 00-1.5 0v5.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V8.25a1.5 1.5 0 011.5-1.5h5.25a.75.75 0 000-1.5H5.25z"/>
+                            </svg>
+                            Example
+                          </p>
+                          <p className="text-gray-800 text-sm italic">
+                            "{item.sentence}"
+                          </p>
+                        </div>
+                      )}
+                      
+                      {item.synonyms && item.synonyms.length > 0 && (
+                        <div>
+                          <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
+                            Synonyms
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {item.synonyms.map((syn, idx) => (
+                              <span
+                                key={idx}
+                                className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm"
+                              >
+                                {syn}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               ))}
             </div>
 
-            {/* Load More Button */}
             {pagination.hasMore && !searchTerm && (
               <div className="flex justify-center mt-8">
                 <button
