@@ -18,6 +18,7 @@ export default function AllWordsPage() {
   });
 
   const endRef = useRef(null);
+  const topRef = useRef(null);
 
   useEffect(() => {
     fetchAllWords(1);
@@ -57,6 +58,10 @@ export default function AllWordsPage() {
 
   const scrollToEnd = () => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToTop = () => {
+    topRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleDelete = async (word) => {
@@ -114,7 +119,7 @@ export default function AllWordsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+        <div ref={topRef} className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">All Words</h2>
           <p className="text-gray-600">
             Browse your complete vocabulary collection ({pagination.total} words)
@@ -300,6 +305,20 @@ export default function AllWordsPage() {
         )}
 
         <div ref={endRef} className="h-1"></div>
+
+        {!loading && filteredWords.length > 0 && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={scrollToTop}
+              className="px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all shadow-sm font-medium flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+              Go to Top
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
