@@ -10,6 +10,7 @@ export default function AllWordsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [speakingWord, setSpeakingWord] = useState(null);
   const [showDetailsOnly, setShowDetailsOnly] = useState(false);
+  const [jumpToPage, setJumpToPage] = useState('');
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 50,
@@ -55,6 +56,45 @@ export default function AllWordsPage() {
 
   const handleLoadMore = () => {
     fetchAllWords(pagination.page + 1);
+  };
+
+  const handleJumpToPage = async () => {
+    const pageNum = parseInt(jumpToPage);
+    
+    if (!pageNum || pageNum < 1) {
+      alert('Please enter a valid page number (minimum 1)');
+      return;
+    }
+    
+    if (pageNum > pagination.totalPages) {
+      alert(`Page ${pageNum} doesn't exist. Maximum page is ${pagination.totalPages}`);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      scrollToTop();
+
+      const response = await fetch(
+        `https://words-backend-k8uu.onrender.com/api/vocabulary?page=${pageNum}&limit=50`
+      );
+      const result = await response.json();
+
+      setWords(result.data);
+      setPagination(result.pagination);
+      setJumpToPage('');
+    } catch (error) {
+      console.error('Error jumping to page:', error);
+      alert('Error loading page. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleJumpInputKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleJumpToPage();
+    }
   };
 
   const scrollToEnd = () => {
@@ -119,7 +159,7 @@ export default function AllWordsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-          <Navbar />
+      <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div ref={topRef} className="mb-8">
@@ -168,6 +208,39 @@ export default function AllWordsPage() {
             </svg>
             Go to End
           </button>
+        </div>
+
+        {/* Jump to Page Section */}
+        <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <label htmlFor="jumpToPage" className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+              Jump to Page:
+            </label>
+            <input
+              id="jumpToPage"
+              type="number"
+              min="1"
+              max={pagination.totalPages}
+              value={jumpToPage}
+              onChange={(e) => setJumpToPage(e.target.value)}
+              onKeyPress={handleJumpInputKeyPress}
+              placeholder={`1 - ${pagination.totalPages}`}
+              className="text-black w-32 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+            />
+            <button
+              onClick={handleJumpToPage}
+              disabled={!jumpToPage}
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed font-medium shadow-sm flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              Go
+            </button>
+            <span className="text-sm text-gray-600">
+              Currently on page <span className="font-semibold text-indigo-600">{pagination.page}</span> of <span className="font-semibold">{pagination.totalPages}</span>
+            </span>
+          </div>
         </div>
 
         {pagination.hasMore && !searchTerm && (
