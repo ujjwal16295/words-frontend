@@ -13,7 +13,9 @@ export default function Navbar() {
     { name: 'Random 10', path: '/random' },
     { name: 'Add Words', path: '/add' },
     { name: 'Groups', path: '/groups' },
-    { name: 'Tones', path: '/tone' }
+    { name: 'Tones', path: '/tone' },
+    { name: 'star', path: '/star' }
+
   ];
 
   return (
